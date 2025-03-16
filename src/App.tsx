@@ -12,21 +12,25 @@ declare global {
 function App() {
 	const [isPlayerOn, setPlayerOn] = useState(false)
 	const [player, setPlayer] = useState<any | null>(null)
+	const [currentTime, setCurrentTime] = useState<number>(0)
+	const intervalRef = useRef(null)
 	const [playerInfo, setPlayerInfo] = useState<{ videoTitle: ''; currentTime: number; duration: number }>({
 		videoTitle: '',
 		currentTime: 0,
 		duration: 0,
 	})
 	const playerContainerRef = useRef<HTMLDivElement | null>(null)
+	const [videoId, setVideoId] = useState('2pU-ojVwGUU')
 
 	const onPlayerReady = (event: any) => {
-		setPlayerInfo({ ...playerInfo, videoTitle: event.target.videoTitle })
+		setPlayerInfo({ ...playerInfo, videoTitle: event.target.videoTitle, duration: event.target.getDuration() })
 	}
 
-	const onYouTubeIframeAPIReady = () => {
+	const onYouTubeIframeAPIReady = (id: string) => {
+		if (player) player.destroy()
 		if (playerContainerRef.current) {
 			const ytPlayer = new window.YT.Player(playerContainerRef.current, {
-				videoId: 'BxqYUbNR-c0', // Replace with your desired video ID
+				videoId: id, // Replace with your desired video ID
 				playerVars: {
 					autoplay: 1,
 					controls: 0,
@@ -39,7 +43,6 @@ function App() {
 					onStateChange: onPlayerStateChange,
 				},
 			})
-			console.log(ytPlayer.getDuration())
 			setPlayer(ytPlayer)
 		}
 	}
@@ -82,16 +85,25 @@ function App() {
 		}
 	}
 
+	const seekTo = (sec: number, skip = false) => {
+		if (player) {
+			const skipTo = skip ? sec : player.getCurrentTime() + sec
+			player.seekTo(skipTo)
+		}
+	}
+
 	useEffect(() => {
 		if (!window.YT) {
 			const script = document.createElement('script')
 			script.src = 'https://www.youtube.com/iframe_api'
 			script.onload = () => {
 				// Initialize the player
-				window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady
+				window.onYouTubeIframeAPIReady = () => onYouTubeIframeAPIReady(videoId)
 			}
 
 			document.body.appendChild(script)
+		} else {
+			onYouTubeIframeAPIReady(videoId)
 		}
 		return () => {
 			// Clean up when the component unmounts
@@ -100,21 +112,60 @@ function App() {
 				script.remove()
 			}
 		}
-	}, [])
+	}, [videoId])
+
+	useEffect(() => {
+		if (player) {
+			// Set interval to update the current time every second
+			if (!intervalRef.current) {
+				intervalRef.current = setInterval(() => {
+					setCurrentTime(player.getCurrentTime()) // Use getCurrentTime method to get the current time
+				}, 1000)
+			}
+		}
+
+		// Cleanup interval on component unmount or when player changes
+		return () => {
+			if (intervalRef.current) {
+				clearInterval(intervalRef.current) // Clear the existing interval
+				intervalRef.current = null // Reset the reference
+			}
+		}
+	}, [player])
+
 	return (
 		<div className="relative">
 			<div ref={playerContainerRef} className="pointer-events-none min-h-dvh min-w-dvw"></div>
 
 			<div className="absolute bottom-0 flex min-h-32 w-full items-center justify-center">
 				{isPlayerOn ? (
-					<div className="animate-fade-up animate-duration-800 relative mb-12 flex h-40 w-1/2 flex-col items-center justify-center gap-4 overflow-hidden rounded-xl">
-						<p className="text-red-500">{playerInfo.videoTitle} </p>
-						<p className="text-red-500">{playerInfo.currentTime} </p>
-						<input type="range" className="w-2/3" max={player.getDuration()} />
-						<div className="flex items-center justify-center gap-4">
-							<p>back</p>
-							<p onClick={() => playPauseVideo()}>pause/play</p>
-							<p>skip</p>
+					<div className="h-32 w-full bg-[#212121]">
+						<input
+							type="range"
+							className="absolute -top-2 w-full"
+							value={currentTime}
+							min={0}
+							max={playerInfo.duration}
+							step={1}
+							onChange={(e) => seekTo(parseFloat(e.target.value), true)}
+						/>
+						<div className="flex h-full w-full items-center justify-between">
+							<div className="flex w-1/3 items-center justify-center gap-4">
+								<p onClick={() => seekTo(-10)}>back</p>
+								<p onClick={() => playPauseVideo()}>pause/play</p>
+								<p onClick={() => seekTo(10)}>skip</p>
+								<p
+									onClick={() =>
+										setVideoId(videoId === 'BxqYUbNR-c0' ? '2pU-ojVwGUU' : 'BxqYUbNR-c0')
+									}
+								>
+									change song
+								</p>
+							</div>
+							<div className="w-1/3">
+								<p className="text-2xl font-semibold text-white">{playerInfo.videoTitle} </p>
+							</div>
+							<div className="w-1/3"></div>
 						</div>
 					</div>
 				) : (
