@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'tailwindcss-animated';
+@plugin "daisyui";
 
 :root {
 	font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -14,4 +15,13 @@
 
 body {
 	margin: 0;
+}
+
+@plugin "daisyui" {
+	themes:
+		light --default,
+		dark --night,
+		night,
+		synthwave,
+		cupcake;
 }

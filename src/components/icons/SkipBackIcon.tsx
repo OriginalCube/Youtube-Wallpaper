@@ -1,0 +1,16 @@
+function SkipBackIcon() {
+	return (
+		<svg xmlns="http://www.w3.org/2000/svg" className="size-full" viewBox="0 0 24 24">
+			<path
+				fill="none"
+				stroke="currentColor"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				stroke-width="2"
+				d="M19 20L9 12l10-8zM5 19V5"
+			></path>
+		</svg>
+	)
+}
+
+export default SkipBackIcon

@@ -36,6 +36,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: ^4.3.4
         version: 4.3.4(vite@6.2.2(jiti@2.4.2)(lightningcss@1.29.2))
+      daisyui:
+        specifier: ^5.0.6
+        version: 5.0.6
       eslint:
         specifier: ^9.21.0
         version: 9.22.0(jiti@2.4.2)
@@ -707,6 +710,9 @@ packages:
 
   csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
+
+  daisyui@5.0.6:
+    resolution: {integrity: sha512-/e/9Gw/2y9oawBJlWkJMSEhRXdmfOLvcPl+6q/x2rPEdIVOtebs1t3ex2vwySl9vCRs1GGNBKCiL+P60Ps/wUw==}
 
   debug@4.4.0:
     resolution: {integrity: sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==}
@@ -1892,6 +1898,8 @@ snapshots:
       which: 2.0.2
 
   csstype@3.1.3: {}
+
+  daisyui@5.0.6: {}
 
   debug@4.4.0:
     dependencies:
