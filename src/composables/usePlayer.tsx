@@ -1,25 +1,22 @@
 import { useEffect, useState, useRef, RefObject } from 'react'
 
-declare global {
-	interface Window {
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		YT: any
-		onYouTubeIframeAPIReady: () => void
-	}
-}
-
 export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) {
+	const [isPlayerOn, setPlayerOn] = useState(true)
 	const [player, setPlayer] = useState<any | null>(null)
 	const [currentTime, setCurrentTime] = useState<number>(0)
+	const [songId, setSongId] = useState(0)
 	const intervalRef = useRef<null | number>(null)
-	const [playerInfo, setPlayerInfo] = useState<{ videoTitle: ''; currentTime: number; duration: number }>({
+	const [playerInfo, setPlayerInfo] = useState<PlayerInfo>({
 		videoTitle: '',
-		currentTime: 0,
 		duration: 0,
+		volume: 80,
 	})
-	const [videoId, setVideoId] = useState('2pU-ojVwGUU')
+	// testing
+	const playlist = ['gXlpa2M7BRk', 'g2t7utfVD50', 'xKk655CDFn8']
+	const [videoId, setVideoId] = useState(playlist[songId])
 
 	const onPlayerReady = (event: any) => {
+		event.target.setVolume(playerInfo.volume)
 		setPlayerInfo({ ...playerInfo, videoTitle: event.target.videoTitle, duration: event.target.getDuration() })
 	}
 
@@ -34,6 +31,7 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 					modestbranding: 1,
 					rel: 0,
 					fs: 0,
+					listType: 'playlist',
 				},
 				events: {
 					onReady: (event: any) => onPlayerReady(event),
@@ -48,13 +46,14 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 	const onPlayerStateChange = (event: any) => {
 		switch (event.data) {
 			case window.YT.PlayerState.PLAYING:
+				setPlayerOn(true)
 				console.log('Video is playing')
 				break
 			case window.YT.PlayerState.PAUSED:
+				setPlayerOn(false)
 				console.log('Video is paused')
 				break
 			case window.YT.PlayerState.ENDED:
-				console.log('Video has ended')
 				break
 			default:
 				console.log('Video state changed')
@@ -62,15 +61,13 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 		}
 	}
 
-	// Skip 10 seconds ahead
-	// const skipTenSeconds = () => {
-	// 	if (player) {
-	// 		const currentTime = player.getCurrentTime()
-	// 		player.seekTo(currentTime + 10)
-	// 	}
-	// }
+	const setVolume = (val: number) => {
+		if (player) {
+			setPlayerInfo({ ...playerInfo, volume: val })
+			player.setVolume(val)
+		}
+	}
 
-	// Play/Pause the video
 	const toggleVideoPlayback = () => {
 		if (player) {
 			const state = player.getPlayerState()
@@ -88,8 +85,32 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 			player.seekTo(skipTo)
 		}
 	}
+
+	const changeMusic = (skip = false) => {
+		if (skip) {
+			if (songId < playlist.length - 1) {
+				setSongId(songId + 1)
+			} else {
+				setSongId(0)
+			}
+		} else {
+			if (currentTime > 5) {
+				seekTo(0, skip)
+			} else {
+				if (songId === 0) {
+					setSongId(playlist.length - 1)
+				} else {
+					setSongId(songId - 1)
+				}
+			}
+		}
+	}
+
 	useEffect(() => {
-		console.log(playerContainerRef)
+		setVideoId(playlist[songId])
+	}, [songId])
+
+	useEffect(() => {
 		if (playerContainerRef) {
 			if (!window.YT) {
 				const script = document.createElement('script')
@@ -115,22 +136,20 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 
 	useEffect(() => {
 		if (player) {
-			// Set interval to update the current time every second
 			if (!intervalRef.current) {
 				intervalRef.current = setInterval(() => {
-					setCurrentTime(player.getCurrentTime()) // Use getCurrentTime method to get the current time
+					setCurrentTime(player.getCurrentTime())
 				}, 1000)
 			}
 		}
 
-		// Cleanup interval on component unmount or when player changes
 		return () => {
 			if (intervalRef.current) {
-				clearInterval(intervalRef.current) // Clear the existing interval
-				intervalRef.current = null // Reset the reference
+				clearInterval(intervalRef.current)
+				intervalRef.current = null
 			}
 		}
 	}, [player])
 
-	return { toggleVideoPlayback }
+	return { toggleVideoPlayback, currentTime, seekTo, playerInfo, isPlayerOn, setVolume, changeMusic }
 }
