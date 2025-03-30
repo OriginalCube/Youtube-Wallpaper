@@ -68,9 +68,9 @@ function PlayerDashboard(props: PropsType) {
 
 				<div className="group-hover:text-secondary text-base-content flex flex-col">
 					<p className="whitespace-wrap max-w-[250px] text-lg text-nowrap text-ellipsis">
-						{JSON.stringify(props.playerInfo.videoTitle)}{' '}
+						{props.playerInfo.videoTitle}{' '}
 					</p>
-					<p className="text-sm"> Youtube Wallpaper </p>
+					<p className="text-sm"> {props.playerInfo.videoAuthor} </p>
 				</div>
 			</div>
 

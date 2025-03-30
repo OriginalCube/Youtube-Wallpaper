@@ -8,30 +8,35 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 	const intervalRef = useRef<null | number>(null)
 	const [playerInfo, setPlayerInfo] = useState<PlayerInfo>({
 		videoTitle: '',
+		videoAuthor: '',
 		duration: 0,
 		volume: 80,
 	})
 	// testing
-	const playlist = ['gXlpa2M7BRk', 'g2t7utfVD50', 'xKk655CDFn8']
-	const [videoId, setVideoId] = useState(playlist[songId])
+	const playlist = ['lb-B2zi9DtY', 'aKq8bkY5eTU', 'xKk655CDFn8', 'jfKfPfyJRdk']
 
 	const onPlayerReady = (event: any) => {
 		event.target.setVolume(playerInfo.volume)
-		setPlayerInfo({ ...playerInfo, videoTitle: event.target.videoTitle, duration: event.target.getDuration() })
+		const videoData = event.target.getVideoData()
+		setPlayerInfo({
+			...playerInfo,
+			videoTitle: videoData.title,
+			videoAuthor: 'Youtube Wallpaper',
+			duration: event.target.getDuration(),
+		})
 	}
 
 	const onYouTubeIframeAPIReady = (id: string) => {
 		if (player) player.destroy()
 		if (playerContainerRef.current) {
 			const ytPlayer = new window.YT.Player(playerContainerRef.current, {
-				videoId: id, // Replace with your desired video ID
+				videoId: id,
 				playerVars: {
 					autoplay: 1,
 					controls: 0,
 					modestbranding: 1,
 					rel: 0,
 					fs: 0,
-					listType: 'playlist',
 				},
 				events: {
 					onReady: (event: any) => onPlayerReady(event),
@@ -95,7 +100,7 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 			}
 		} else {
 			if (currentTime > 5) {
-				seekTo(0, skip)
+				seekTo(0, true)
 			} else {
 				if (songId === 0) {
 					setSongId(playlist.length - 1)
@@ -107,7 +112,20 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 	}
 
 	useEffect(() => {
-		setVideoId(playlist[songId])
+		if (player) {
+			player.loadVideoById(playlist[songId])
+			player.addEventListener('onStateChange', function (event: any) {
+				if (event.data === window.YT.PlayerState.PLAYING) {
+					const videoData = player.getVideoData()
+					setPlayerInfo({
+						...playerInfo,
+						videoTitle: videoData.title,
+						videoAuthor: videoData.author,
+						duration: player.getDuration(),
+					})
+				}
+			})
+		}
 	}, [songId])
 
 	useEffect(() => {
@@ -117,12 +135,12 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 				script.src = 'https://www.youtube.com/iframe_api'
 				script.onload = () => {
 					// Initialize the player
-					window.onYouTubeIframeAPIReady = () => onYouTubeIframeAPIReady(videoId)
+					window.onYouTubeIframeAPIReady = () => onYouTubeIframeAPIReady(playlist[0])
 				}
 
 				document.body.appendChild(script)
 			} else {
-				onYouTubeIframeAPIReady(videoId)
+				onYouTubeIframeAPIReady(playlist[0])
 			}
 			return () => {
 				// Clean up when the component unmounts
@@ -132,7 +150,7 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 				}
 			}
 		}
-	}, [videoId, playerContainerRef])
+	}, [playerContainerRef])
 
 	useEffect(() => {
 		if (player) {
@@ -150,6 +168,18 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 			}
 		}
 	}, [player])
+
+	useEffect(() => {
+		const handleBeforeUnload = () => {
+			player.destroy()
+		}
+
+		window.addEventListener('beforeunload', handleBeforeUnload)
+
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload)
+		}
+	}, [])
 
 	return { toggleVideoPlayback, currentTime, seekTo, playerInfo, isPlayerOn, setVolume, changeMusic }
 }

@@ -5,7 +5,8 @@ interface Window {
 }
 
 type PlayerInfo = {
-	videoTitle: ''
+	videoAuthor: string
+	videoTitle: string
 	duration: number
 	volume: number
 }
