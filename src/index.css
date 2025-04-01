@@ -19,9 +19,9 @@ body {
 
 @plugin "daisyui" {
 	themes:
-		light --default,
-		dark --night,
-		night,
+		dark --default,
 		synthwave,
+		light,
+		night,
 		cupcake;
 }

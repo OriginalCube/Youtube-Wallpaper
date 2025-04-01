@@ -1,6 +1,6 @@
 import { useRef } from 'react'
-import PlayerDashboard from './components/player/PlayerDashboard'
-import { usePlayer } from './composables/usePlayer'
+import PlayerDashboard from '@/components/player/PlayerDashboard'
+import { usePlayer } from '@/composables/usePlayer'
 
 function App() {
 	const playerContainerRef = useRef<HTMLDivElement>(null)

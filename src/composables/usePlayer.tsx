@@ -13,7 +13,7 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 		volume: 80,
 	})
 	// testing
-	const playlist = ['lb-B2zi9DtY', 'aKq8bkY5eTU', 'xKk655CDFn8', 'jfKfPfyJRdk']
+	const playlist = ['yrKzmoNOXFM', 'aKq8bkY5eTU', 'xKk655CDFn8', 'jfKfPfyJRdk']
 
 	const onPlayerReady = (event: any) => {
 		event.target.setVolume(playerInfo.volume)
@@ -59,6 +59,7 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 				console.log('Video is paused')
 				break
 			case window.YT.PlayerState.ENDED:
+				changeMusic(true)
 				break
 			default:
 				console.log('Video state changed')
