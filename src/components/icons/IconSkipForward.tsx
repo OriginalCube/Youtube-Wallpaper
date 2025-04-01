@@ -1,4 +1,4 @@
-function SkipForwardIcon() {
+function IconSkipForward() {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" className="size-full" viewBox="0 0 24 24">
 			<path
@@ -13,4 +13,4 @@ function SkipForwardIcon() {
 	)
 }
 
-export default SkipForwardIcon
+export default IconSkipForward

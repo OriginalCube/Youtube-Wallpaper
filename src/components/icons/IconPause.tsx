@@ -1,4 +1,4 @@
-function PauseIcon() {
+function IconPause() {
 	return (
 		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="size-full">
 			<g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
@@ -9,4 +9,4 @@ function PauseIcon() {
 	)
 }
 
-export default PauseIcon
+export default IconPause

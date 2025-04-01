@@ -1,11 +1,11 @@
 import { formatSeconds } from '../../composables/useTimeHelpers'
 import Button from '../base/Button'
-import FileMusicIcon from '../icons/FileMusicIcon'
-import PauseIcon from '../icons/PauseIcon'
-import PlayIcon from '../icons/PlayIcon'
-import SkipBackIcon from '../icons/SkipBackIcon'
-import SkipForwardIcon from '../icons/SkipForwardIcon'
-import VolumeIcon from '../icons/VolumeIcon'
+import IconFileMusic from '../icons/IconFileMusic'
+import IconPause from '../icons/IconPause'
+import IconPlay from '../icons/IconPlay'
+import IconSkipBack from '../icons/IconSkipBack'
+import IconSkipForward from '../icons/IconSkipForward'
+import IconVolume from '../icons/IconVolume'
 
 type PropsType = {
 	toggleVideoPlayback: () => void
@@ -36,17 +36,17 @@ function PlayerDashboard(props: PropsType) {
 				<div className="flex h-full gap-2">
 					<div className="flex items-center gap-4">
 						<Button variants="icon" className="btn-ghost size-10" onClick={() => props.changeMusic(false)}>
-							<SkipBackIcon />
+							<IconSkipBack />
 						</Button>
 						<Button
 							variants="icon"
 							className="btn-primary size-12"
 							onClick={() => props.toggleVideoPlayback()}
 						>
-							{props.isPlayerOn ? <PauseIcon /> : <PlayIcon />}
+							{props.isPlayerOn ? <IconPause /> : <IconPlay />}
 						</Button>
 						<Button variants="icon" className="btn-ghost size-10" onClick={() => props.changeMusic(true)}>
-							<SkipForwardIcon />
+							<IconSkipForward />
 						</Button>
 					</div>
 
@@ -63,7 +63,7 @@ function PlayerDashboard(props: PropsType) {
 			<div className="group flex h-20 w-1/3 items-center justify-center gap-4">
 				{/* Details	*/}
 				<div className="text-base-content group-hover:text-secondary size-10">
-					<FileMusicIcon />
+					<IconFileMusic />
 				</div>
 
 				<div className="group-hover:text-secondary text-base-content flex flex-col">
@@ -86,7 +86,7 @@ function PlayerDashboard(props: PropsType) {
 						onChange={(e) => props.setVolume(Number(e.target.value))}
 					/>
 					<div className="group-hover:text-primary size-8">
-						<VolumeIcon />
+						<IconVolume />
 					</div>
 				</div>
 			</div>
