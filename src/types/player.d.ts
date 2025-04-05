@@ -8,5 +8,4 @@ type PlayerInfo = {
 	videoAuthor: string
 	videoTitle: string
 	duration: number
-	volume: number
 }

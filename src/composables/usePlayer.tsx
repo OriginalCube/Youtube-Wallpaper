@@ -1,6 +1,12 @@
-import { useEffect, useState, useRef, RefObject } from 'react'
+import { useApp } from '@/store/useApp'
+import { useEffect, useState, useRef, RefObject, useMemo } from 'react'
 
 export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) {
+	const volume = useApp((state) => state.volume)
+	const repeat = useApp((state) => state.repeat)
+	const shuffle = useApp((state) => state.shuffle)
+	const playlist = useApp((state) => state.playlist)
+	const setVolumeApp = useApp((state) => state.setVolume)
 	const [isPlayerOn, setPlayerOn] = useState(true)
 	const [player, setPlayer] = useState<any | null>(null)
 	const [currentTime, setCurrentTime] = useState<number>(0)
@@ -10,13 +16,13 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 		videoTitle: '',
 		videoAuthor: '',
 		duration: 0,
-		volume: 80,
 	})
-	// testing
-	const playlist = ['yrKzmoNOXFM', 'aKq8bkY5eTU', 'xKk655CDFn8', 'jfKfPfyJRdk']
+	const appState = useMemo(() => {
+		return { repeat, shuffle }
+	}, [repeat, shuffle])
 
 	const onPlayerReady = (event: any) => {
-		event.target.setVolume(playerInfo.volume)
+		event.target.setVolume(volume)
 		const videoData = event.target.getVideoData()
 		setPlayerInfo({
 			...playerInfo,
@@ -47,29 +53,9 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 		}
 	}
 
-	// Called when the player state changes
-	const onPlayerStateChange = (event: any) => {
-		switch (event.data) {
-			case window.YT.PlayerState.PLAYING:
-				setPlayerOn(true)
-				console.log('Video is playing')
-				break
-			case window.YT.PlayerState.PAUSED:
-				setPlayerOn(false)
-				console.log('Video is paused')
-				break
-			case window.YT.PlayerState.ENDED:
-				changeMusic(true)
-				break
-			default:
-				console.log('Video state changed')
-				break
-		}
-	}
-
 	const setVolume = (val: number) => {
 		if (player) {
-			setPlayerInfo({ ...playerInfo, volume: val })
+			setVolumeApp(val)
 			player.setVolume(val)
 		}
 	}
@@ -89,11 +75,22 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 		if (player) {
 			const skipTo = skip ? sec : player.getCurrentTime() + sec
 			player.seekTo(skipTo)
+			if (window.YT.PlayerState.PAUSED) player.playVideo()
 		}
 	}
 
+	const getRandomSongId = (currentSongId: number) => {
+		let randomId = currentSongId
+		while (randomId === currentSongId) {
+			randomId = Math.floor(Math.random() * playlist.length)
+		}
+		return randomId
+	}
+
 	const changeMusic = (skip = false) => {
-		if (skip) {
+		if (appState.shuffle) {
+			setSongId(getRandomSongId(songId))
+		} else if (skip) {
 			if (songId < playlist.length - 1) {
 				setSongId(songId + 1)
 			} else {
@@ -109,6 +106,29 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 					setSongId(songId - 1)
 				}
 			}
+		}
+	}
+
+	// Called when the player state changes
+	const onPlayerStateChange = (event: any) => {
+		switch (event.data) {
+			case window.YT.PlayerState.PLAYING:
+				setPlayerOn(true)
+				break
+			case window.YT.PlayerState.PAUSED:
+				setPlayerOn(false)
+				break
+			case window.YT.PlayerState.ENDED:
+				if (appState.repeat) {
+					const currentId = songId
+					setSongId(getRandomSongId)
+					setTimeout(() => {
+						setSongId(currentId)
+					}, 100)
+				} else changeMusic(true)
+				break
+			default:
+				break
 		}
 	}
 

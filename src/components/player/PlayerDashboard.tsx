@@ -8,9 +8,11 @@ import IconSkipForward from '@/components/icons/IconSkipForward'
 import IconVolume from '@/components/icons/IconVolume'
 import IconRepeat from '@/components/icons/IconRepeat'
 import IconSettings from '@/components/icons/IconSettings'
-import Dialog from '@/components/base/dialog/Dialog'
 import { useEffect, useRef } from 'react'
-import { useApp } from '../store/useApp'
+import { useApp } from '@/store/useApp'
+import IconShuffle from '@/components/icons/IconShuffle'
+import UserSettings from '@/components/dialog/UserSettings'
+import IconMusicOff from '../icons/IconMusicOff'
 
 type PropsType = {
 	toggleVideoPlayback: () => void
@@ -24,13 +26,43 @@ type PropsType = {
 
 function PlayerDashboard(props: PropsType) {
 	const modalRef = useRef<HTMLDialogElement>(null)
+	const volume = useApp((state) => state.volume)
 	const theme = useApp((state) => state.theme)
+	const repeat = useApp((state) => state.repeat)
+	const shuffle = useApp((state) => state.shuffle)
+	const setRepeat = useApp((state) => state.setRepeat)
+	const setShuffle = useApp((state) => state.setShuffle)
 	const setTheme = useApp((state) => state.setTheme)
 
 	const openModal = () => {
 		if (!modalRef || !modalRef.current) return
 		modalRef.current?.showModal()
 	}
+
+	const updateTheme = (ev: string) => {
+		setTheme(ev)
+	}
+
+	const updateRepeat = () => {
+		setRepeat(!repeat)
+	}
+
+	const updateVolume = () => {
+		if (volume >= 10) {
+			props.setVolume(0)
+		} else {
+			props.setVolume(80)
+		}
+	}
+
+	const updateShuffle = () => {
+		setShuffle(!shuffle)
+	}
+
+	const CONFIGURATIONS: { label: string; action: () => void; key: 'shuffle' | 'repeat' }[] = [
+		{ label: 'Shuffle', action: () => updateShuffle(), key: 'shuffle' },
+		{ label: 'Repeat', action: () => updateRepeat(), key: 'repeat' },
+	]
 
 	const THEMES = [
 		{ label: 'Dark mode', value: 'text', disable: true },
@@ -41,10 +73,6 @@ function PlayerDashboard(props: PropsType) {
 		{ label: 'Cupcake', value: 'cupcake' },
 	]
 
-	const updateTheme = (ev: string) => {
-		setTheme(ev)
-	}
-
 	useEffect(() => {
 		console.log(theme)
 		document.body.setAttribute('data-theme', theme)
@@ -52,21 +80,15 @@ function PlayerDashboard(props: PropsType) {
 
 	return (
 		<div className="bg-base-100 relative flex h-30 w-full justify-between rounded-t-md">
-			<Dialog modalRef={modalRef}>
-				<p className="mb-4 text-xl">Customize</p>
-				<p className="mb-1 font-bold">Theme</p>
-				<select
-					defaultValue="Select Theme"
-					className="select w-full"
-					onChange={(ev) => updateTheme(ev.target.value)}
-				>
-					{THEMES.map((th) => (
-						<option value={th.value} disabled={th.disable ?? false}>
-							{th.label}
-						</option>
-					))}
-				</select>
-			</Dialog>
+			<UserSettings
+				modalRef={modalRef}
+				updateTheme={updateTheme}
+				THEMES={THEMES}
+				volume={volume}
+				theme={theme}
+				CONFIGURATIONS={CONFIGURATIONS}
+				setVolume={props.setVolume}
+			/>
 			<div className="absolute top-0 -mt-3 w-full">
 				<input
 					type="range"
@@ -97,13 +119,19 @@ function PlayerDashboard(props: PropsType) {
 						</Button>
 					</div>
 
-					<span className="bg-primary my-auto h-8 w-0.5" />
+					{props.playerInfo.duration < 1800 ? (
+						<>
+							<span className="bg-primary my-auto h-8 w-0.5" />
 
-					<div className="text-base-content flex h-full items-center text-sm">
-						<p>
-							{formatSeconds(props.currentTime)} / {formatSeconds(props.playerInfo.duration)}
-						</p>
-					</div>
+							<div className="text-base-content flex h-full items-center text-sm">
+								<p>
+									{formatSeconds(props.currentTime)} / {formatSeconds(props.playerInfo.duration)}
+								</p>
+							</div>
+						</>
+					) : (
+						''
+					)}
 				</div>
 			</div>
 
@@ -126,22 +154,41 @@ function PlayerDashboard(props: PropsType) {
 					<input
 						className="range range-xs range-primary w-32 opacity-0 duration-300 ease-in-out group-hover:opacity-100"
 						type="range"
-						value={props.playerInfo.volume}
+						value={volume}
 						min={0}
 						max={100}
 						step={10}
 						onChange={(e) => props.setVolume(Number(e.target.value))}
 					/>
-					<Button variants="icon" className="btn-ghost size-10">
-						<IconVolume />
+					<div className="tooltip" data-tip="Volume">
+						<Button variants="icon" className="btn-ghost size-10" onClick={() => updateVolume()}>
+							{volume >= 10 ? <IconVolume /> : <IconMusicOff />}
+						</Button>
+					</div>
+				</div>
+				<div className="tooltip" data-tip="Shuffle">
+					<Button
+						variants="icon"
+						className={`btn-ghost size-10 ${shuffle ? 'text-primary' : ''}`}
+						onClick={() => updateShuffle()}
+					>
+						<IconShuffle />
 					</Button>
 				</div>
-				<Button variants="icon" className="btn-ghost size-10">
-					<IconRepeat />
-				</Button>
-				<Button variants="icon" className="btn-ghost size-10" onClick={() => openModal()}>
-					<IconSettings />
-				</Button>
+				<div className="tooltip" data-tip="Repeat">
+					<Button
+						variants="icon"
+						className={`btn-ghost size-10 ${repeat ? 'text-primary' : ''}`}
+						onClick={() => updateRepeat()}
+					>
+						<IconRepeat />
+					</Button>
+				</div>
+				<div className="tooltip" data-tip="Settings">
+					<Button variants="icon" className="btn-ghost size-10" onClick={() => openModal()}>
+						<IconSettings />
+					</Button>
+				</div>
 			</div>
 		</div>
 	)
