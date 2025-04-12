@@ -1,6 +1,5 @@
-import { formatSeconds } from '@/composables/useTimeHelpers'
+import { formatSeconds } from '@/composables/useHelpers'
 import Button from '@/components/base/button/Button'
-import IconFileMusic from '@/components/icons/IconFileMusic'
 import IconPause from '@/components/icons/IconPause'
 import IconPlay from '@/components/icons/IconPlay'
 import IconSkipBack from '@/components/icons/IconSkipBack'
@@ -12,7 +11,7 @@ import { useEffect, useRef } from 'react'
 import { useApp } from '@/store/useApp'
 import IconShuffle from '@/components/icons/IconShuffle'
 import UserSettings from '@/components/dialog/UserSettings'
-import IconMusicOff from '../icons/IconMusicOff'
+import IconMusicOff from '@/components/icons/IconMusicOff'
 
 type PropsType = {
 	toggleVideoPlayback: () => void
@@ -68,13 +67,17 @@ function PlayerDashboard(props: PropsType) {
 		{ label: 'Dark mode', value: 'text', disable: true },
 		{ label: 'Night', value: 'night' },
 		{ label: 'Synthwave', value: 'synthwave' },
+		{ label: 'Forest', value: 'forest' },
+		{ label: 'Coffee', value: 'coffee' },
+		{ label: 'Dracula', value: 'dracula' },
 		{ label: 'Light mode', value: 'text', disable: true },
 		{ label: 'Light', value: 'light' },
 		{ label: 'Cupcake', value: 'cupcake' },
+		{ label: 'Retro', value: 'retro' },
+		{ label: 'Cyberpunk', value: 'cyberpunk' },
 	]
 
 	useEffect(() => {
-		console.log(theme)
 		document.body.setAttribute('data-theme', theme)
 	}, [theme])
 
@@ -119,7 +122,7 @@ function PlayerDashboard(props: PropsType) {
 						</Button>
 					</div>
 
-					{props.playerInfo.duration < 1800 ? (
+					{props.playerInfo.duration < 1800 && (
 						<>
 							<span className="bg-primary my-auto h-8 w-0.5" />
 
@@ -129,8 +132,6 @@ function PlayerDashboard(props: PropsType) {
 								</p>
 							</div>
 						</>
-					) : (
-						''
 					)}
 				</div>
 			</div>
@@ -138,14 +139,14 @@ function PlayerDashboard(props: PropsType) {
 			<div className="group flex h-20 w-1/3 items-center justify-center gap-4">
 				{/* Details	*/}
 				<div className="text-base-content group-hover:text-primary size-10">
-					<IconFileMusic />
+					<img src="./images/anime-jam.gif" className="size-full" />
 				</div>
 
 				<div className="group-hover:text-primary text-base-content flex flex-col">
 					<p className="max-w-[400px] overflow-hidden text-lg text-wrap text-ellipsis whitespace-nowrap">
-						{props.playerInfo.videoTitle}{' '}
+						{props.playerInfo.videoTitle ?? 'Loading Video'}
 					</p>
-					<p className="text-sm"> {props.playerInfo.videoAuthor} </p>
+					<p className="text-sm"> {props.playerInfo.videoAuthor ?? 'Youtube Wallpaper'} </p>
 				</div>
 			</div>
 

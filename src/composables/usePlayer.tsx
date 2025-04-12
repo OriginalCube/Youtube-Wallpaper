@@ -1,12 +1,18 @@
 import { useApp } from '@/store/useApp'
-import { useEffect, useState, useRef, RefObject, useMemo } from 'react'
+import { useEffect, useState, useRef, RefObject, useMemo, useCallback } from 'react'
+import { getQueryParamValue, removeString } from './useHelpers'
 
 export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) {
+	const youtube_wallpaper = localStorage.getItem('youtube-wallpaper')
+		? JSON.parse(localStorage.getItem('youtube-wallpaper') as string)
+		: null
 	const volume = useApp((state) => state.volume)
 	const repeat = useApp((state) => state.repeat)
 	const shuffle = useApp((state) => state.shuffle)
-	const playlist = useApp((state) => state.playlist)
 	const setVolumeApp = useApp((state) => state.setVolume)
+	const [playlist, setPlaylist] = useState(
+		youtube_wallpaper.playlist.length ? youtube_wallpaper.playlist : ['lA9FONoiuFA'],
+	)
 	const [isPlayerOn, setPlayerOn] = useState(true)
 	const [player, setPlayer] = useState<any | null>(null)
 	const [currentTime, setCurrentTime] = useState<number>(0)
@@ -75,6 +81,7 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 		if (player) {
 			const skipTo = skip ? sec : player.getCurrentTime() + sec
 			player.seekTo(skipTo)
+			setCurrentTime(skipTo)
 			if (window.YT.PlayerState.PAUSED) player.playVideo()
 		}
 	}
@@ -91,21 +98,30 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 		if (appState.shuffle) {
 			setSongId(getRandomSongId(songId))
 		} else if (skip) {
-			if (songId < playlist.length - 1) {
-				setSongId(songId + 1)
-			} else {
-				setSongId(0)
-			}
+			setSongId((prev) => (prev < playlist.length - 1 ? prev + 1 : 0))
 		} else {
 			if (currentTime > 5) {
 				seekTo(0, true)
 			} else {
-				if (songId === 0) {
-					setSongId(playlist.length - 1)
-				} else {
-					setSongId(songId - 1)
-				}
+				setSongId((prev) => (prev === 0 ? playlist.length - 1 : prev - 1))
 			}
+		}
+	}
+
+	const loadVideoById = (vidId: string) => {
+		if (player) {
+			player.loadVideoById(vidId)
+			player.addEventListener('onStateChange', function (event: any) {
+				if (event.data === window.YT.PlayerState.PLAYING) {
+					const videoData = player.getVideoData()
+					setPlayerInfo({
+						...playerInfo,
+						videoTitle: videoData.title,
+						videoAuthor: videoData.author,
+						duration: player.getDuration(),
+					})
+				}
+			})
 		}
 	}
 
@@ -119,35 +135,20 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 				setPlayerOn(false)
 				break
 			case window.YT.PlayerState.ENDED:
-				if (appState.repeat) {
-					const currentId = songId
-					setSongId(getRandomSongId)
-					setTimeout(() => {
-						setSongId(currentId)
-					}, 100)
-				} else changeMusic(true)
+				changeMusic(true)
 				break
 			default:
 				break
 		}
 	}
 
+	const handleUpdateSongId = useCallback(() => {
+		loadVideoById(playlist[songId])
+	}, [playlist, songId])
+
 	useEffect(() => {
-		if (player) {
-			player.loadVideoById(playlist[songId])
-			player.addEventListener('onStateChange', function (event: any) {
-				if (event.data === window.YT.PlayerState.PLAYING) {
-					const videoData = player.getVideoData()
-					setPlayerInfo({
-						...playerInfo,
-						videoTitle: videoData.title,
-						videoAuthor: videoData.author,
-						duration: player.getDuration(),
-					})
-				}
-			})
-		}
-	}, [songId])
+		handleUpdateSongId()
+	}, [handleUpdateSongId])
 
 	useEffect(() => {
 		if (playerContainerRef) {
@@ -174,9 +175,14 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 	}, [playerContainerRef])
 
 	useEffect(() => {
+		const repeatVideo = (vidDuration: number, vidCurrent: number) => {
+			if (vidDuration - vidCurrent < 1 && appState.repeat) seekTo(0, true)
+		}
 		if (player) {
 			if (!intervalRef.current) {
+				// @ts-expect-error wallpaper engine prod
 				intervalRef.current = setInterval(() => {
+					repeatVideo(player.getDuration(), player.getCurrentTime())
 					setCurrentTime(player.getCurrentTime())
 				}, 1000)
 			}
@@ -188,7 +194,7 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 				intervalRef.current = null
 			}
 		}
-	}, [player])
+	}, [player, appState.repeat])
 
 	useEffect(() => {
 		const handleBeforeUnload = () => {
@@ -201,6 +207,31 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 			window.removeEventListener('beforeunload', handleBeforeUnload)
 		}
 	}, [])
+
+	// @ts-expect-error wallpaper engine event
+	window.wallpaperPropertyListener = {
+		applyUserProperties: (properties: any) => {
+			if (properties.youtube_links) {
+				const videoLinks: string[] = []
+				const result = removeString(properties.youtube_links.value).split(',')
+				for (const yt_link of result) {
+					try {
+						const vid = getQueryParamValue(yt_link, 'v')
+						if (vid?.length) videoLinks.push(vid)
+					} catch {
+						console.error('Link is not working')
+					}
+				}
+				if (videoLinks.length) {
+					youtube_wallpaper.playlist = videoLinks
+					localStorage.setItem('youtube-wallpaper', JSON.stringify(youtube_wallpaper))
+					setPlaylist(videoLinks)
+					if (songId === 0) loadVideoById(videoLinks[0])
+					else setSongId(0)
+				}
+			}
+		},
+	}
 
 	return { toggleVideoPlayback, currentTime, seekTo, playerInfo, isPlayerOn, setVolume, changeMusic }
 }

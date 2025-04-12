@@ -19,9 +19,14 @@ body {
 
 @plugin "daisyui" {
 	themes:
-		dark --default,
+		night --default,
+		dark,
 		synthwave,
 		light,
-		night,
+		forest,
+		dracula,
+		coffee,
+		retro,
+		cyberpunk,
 		cupcake;
 }
