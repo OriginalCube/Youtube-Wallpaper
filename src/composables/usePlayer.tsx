@@ -1,6 +1,6 @@
 import { useApp } from '@/store/useApp'
 import { useEffect, useState, useRef, RefObject, useMemo, useCallback } from 'react'
-import { getQueryParamValue, removeString } from './useHelpers'
+import { getQueryParamValue, removeString } from '@/composables/useHelpers'
 
 export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) {
 	const youtube_wallpaper = localStorage.getItem('youtube-wallpaper')
@@ -9,6 +9,7 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 	const volume = useApp((state) => state.volume)
 	const repeat = useApp((state) => state.repeat)
 	const shuffle = useApp((state) => state.shuffle)
+	const setImage = useApp((state) => state.setImage)
 	const setVolumeApp = useApp((state) => state.setVolume)
 	const [playlist, setPlaylist] = useState(
 		youtube_wallpaper.playlist.length ? youtube_wallpaper.playlist : ['lA9FONoiuFA'],
@@ -176,7 +177,7 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 
 	useEffect(() => {
 		const repeatVideo = (vidDuration: number, vidCurrent: number) => {
-			if (vidDuration - vidCurrent < 1 && appState.repeat) seekTo(0, true)
+			if (vidDuration - vidCurrent < 1.99 && appState.repeat) seekTo(0, true)
 		}
 		if (player) {
 			if (!intervalRef.current) {
@@ -229,6 +230,11 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 					if (songId === 0) loadVideoById(videoLinks[0])
 					else setSongId(0)
 				}
+			}
+
+			if (properties.images) {
+				if (properties.images.value) setImage(`file:///${properties.images.value}`)
+				else setImage('')
 			}
 		},
 	}

@@ -5,10 +5,12 @@ type AppType = {
 	volume: number
 	repeat: boolean
 	shuffle: boolean
+	image: string
 	setTheme: (daisyTheme: string) => void
 	setVolume: (vol: number) => void
 	setRepeat: (rep: boolean) => void
 	setShuffle: (shuf: boolean) => void
+	setImage: (img: string) => void
 }
 
 const initial_state = {
@@ -16,7 +18,7 @@ const initial_state = {
 	volume: 80,
 	repeat: false,
 	shuffle: false,
-	playlist: ['jWQx2f-CErU', 'jJxMlmf58SM', 'wSTbdqo-j74', 'a4na2opArGY'],
+	playlist: ['lA9FONoiuFA'],
 }
 
 export const useApp = create<AppType>((set) => {
@@ -35,12 +37,14 @@ export const useApp = create<AppType>((set) => {
 			volume: 80,
 			repeat: false,
 			shuffle: false,
-			playlist: ['gPLNRDjY6RI', 'jWQx2f-CErU', 'jJxMlmf58SM', 'wSTbdqo-j74', 'a4na2opArGY'],
+			image: './images/anime-jam.gif',
+			playlist: ['lA9FONoiuFA'],
 
 			setTheme: (daisyTheme) => set({ theme: daisyTheme }),
 			setVolume: (vol) => set({ volume: vol }),
 			setRepeat: (rep) => set({ repeat: rep, shuffle: false }),
 			setShuffle: (shuf) => set({ shuffle: shuf, repeat: false }),
+			setImage: (img) => set({ image: img }),
 		}
 	}
 
@@ -49,6 +53,7 @@ export const useApp = create<AppType>((set) => {
 		volume: youtube_storage.volume,
 		repeat: youtube_storage.repeat,
 		shuffle: youtube_storage.shuffle,
+		image: youtube_storage.image,
 		playlist: youtube_storage.playlist,
 
 		setTheme: (daisyTheme) =>
@@ -76,6 +81,12 @@ export const useApp = create<AppType>((set) => {
 				youtube_storage.repeat = false
 				saveStorage(youtube_storage)
 				return { shuffle: shuf, repeat: false }
+			}),
+		setImage: (img) =>
+			set(() => {
+				youtube_storage.image = img
+				saveStorage(youtube_storage)
+				return { image: img }
 			}),
 	}
 })

@@ -29,6 +29,7 @@ function PlayerDashboard(props: PropsType) {
 	const theme = useApp((state) => state.theme)
 	const repeat = useApp((state) => state.repeat)
 	const shuffle = useApp((state) => state.shuffle)
+	const subImage = useApp((state) => state.image)
 	const setRepeat = useApp((state) => state.setRepeat)
 	const setShuffle = useApp((state) => state.setShuffle)
 	const setTheme = useApp((state) => state.setTheme)
@@ -139,11 +140,11 @@ function PlayerDashboard(props: PropsType) {
 			<div className="group flex h-20 w-1/3 items-center justify-center gap-4">
 				{/* Details	*/}
 				<div className="text-base-content group-hover:text-primary size-10">
-					<img src="./images/anime-jam.gif" className="size-full" />
+					<img src={subImage.length ? subImage : './images/anime-jam.gif'} className="size-full" />
 				</div>
 
 				<div className="group-hover:text-primary text-base-content flex flex-col">
-					<p className="max-w-[400px] overflow-hidden text-lg text-wrap text-ellipsis whitespace-nowrap">
+					<p className="max-w-[400px] overflow-hidden text-lg font-semibold text-wrap text-ellipsis whitespace-nowrap">
 						{props.playerInfo.videoTitle ?? 'Loading Video'}
 					</p>
 					<p className="text-sm"> {props.playerInfo.videoAuthor ?? 'Youtube Wallpaper'} </p>
