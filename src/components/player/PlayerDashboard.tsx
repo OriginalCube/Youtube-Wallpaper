@@ -137,17 +137,22 @@ function PlayerDashboard(props: PropsType) {
 				</div>
 			</div>
 
-			<div className="group flex h-20 w-1/3 items-center justify-center gap-4">
-				{/* Details	*/}
-				<div className="text-base-content group-hover:text-primary size-10">
-					<img src={subImage.length ? subImage : './images/anime-jam.gif'} className="size-full" />
-				</div>
+			<div className="tooltip" data-tip={props.playerInfo.videoTitle}>
+				<div className="group flex h-20 w-1/3 items-center justify-center gap-4">
+					{/* Details	*/}
+					<div className="text-base-content group-hover:text-primary size-10">
+						<img
+							src={subImage && subImage.length ? subImage : './images/anime-jam.gif'}
+							className="size-full"
+						/>
+					</div>
 
-				<div className="group-hover:text-primary text-base-content flex flex-col">
-					<p className="max-w-[400px] overflow-hidden text-lg font-semibold text-wrap text-ellipsis whitespace-nowrap">
-						{props.playerInfo.videoTitle ?? 'Loading Video'}
-					</p>
-					<p className="text-sm"> {props.playerInfo.videoAuthor ?? 'Youtube Wallpaper'} </p>
+					<div className="group-hover:text-primary text-base-content flex flex-col">
+						<p className="max-w-[400px] overflow-hidden text-lg font-semibold text-wrap text-ellipsis whitespace-nowrap">
+							{props.playerInfo.videoTitle ?? 'Loading Video'}
+						</p>
+						<p className="text-sm"> {props.playerInfo.videoAuthor ?? 'Youtube Wallpaper'} </p>
+					</div>
 				</div>
 			</div>
 
