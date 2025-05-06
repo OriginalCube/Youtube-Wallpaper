@@ -232,8 +232,8 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 				}
 			}
 
-			if (properties.images) {
-				if (properties.images.value) setImage(`file:///${properties.images.value}`)
+			if (properties.image) {
+				if (properties.image.value) setImage(`file:///${properties.image.value}`)
 				else setImage('')
 			}
 		},
