@@ -43,7 +43,7 @@ export function usePlayer(playerContainerRef: RefObject<HTMLDivElement | null>) 
 		if (player) player.destroy()
 		if (playerContainerRef.current) {
 			const ytPlayer = new window.YT.Player(playerContainerRef.current, {
-				videoId: id,
+				videoId: '-FwuyzOZuS0',
 				playerVars: {
 					autoplay: 1,
 					controls: 0,

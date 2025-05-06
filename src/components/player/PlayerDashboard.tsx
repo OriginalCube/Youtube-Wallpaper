@@ -82,6 +82,24 @@ function PlayerDashboard(props: PropsType) {
 		document.body.setAttribute('data-theme', theme)
 	}, [theme])
 
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			// Check for specific keys
+			if (e.key === 'n') {
+				e.preventDefault()
+				updateTheme(THEMES[Math.floor(Math.random() * THEMES.length)].value)
+			}
+		}
+
+		// Add event listener
+		window.addEventListener('keydown', handleKeyDown)
+
+		// Cleanup
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+		}
+	}, []) // Empty dependency array means this runs once on mount
+
 	return (
 		<div className="bg-base-100 relative flex h-30 w-full justify-between rounded-t-md">
 			<UserSettings
@@ -149,7 +167,7 @@ function PlayerDashboard(props: PropsType) {
 				<div className="group-hover:text-primary text-base-content flex flex-col">
 					<div className="tooltip" data-tip={props.playerInfo.videoTitle}>
 						<p className="max-w-[400px] overflow-hidden text-lg font-semibold text-wrap text-ellipsis whitespace-nowrap">
-							{props.playerInfo.videoTitle ?? 'Loading Video'}
+							{props.playerInfo.videoTitle.slice(0, 13) ?? 'Loading Video'}
 						</p>
 						<p className="text-sm"> {props.playerInfo.videoAuthor ?? 'Youtube Wallpaper'} </p>
 					</div>
