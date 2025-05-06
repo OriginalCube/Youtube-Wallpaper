@@ -1,54 +1,62 @@
-# React + TypeScript + Vite
+# 🎥 YouTube Wallpaper - Bring Your Screen to Life!
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Transform any YouTube video into your dynamic desktop wallpaper!** 🌟
 
-Currently, two official plugins are available:
+This isn't just a wallpaper—it's an **interactive experience** powered by the [YouTube IFrame API](https://developers.google.com/youtube/iframe_api_reference). Change videos on the fly, customize playback, and make your desktop uniquely yours!
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## 🖼️ Preview Gallery
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Default Thumbnail
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+![YouTube Wallpaper Demo](./public/github/2.png)
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### More Stunning Examples
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+![YouTube Wallpaper Customization](./public/github/3.png)
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+![YouTube Wallpaper Customization](./public/github/1.png)
+
+_(Want to see it in action? Try it out below!)_
+
+---
+
+## 🚀 Features
+
+✔ **Seamless YouTube Integration** – Play any video as your wallpaper  
+✔ **Real-Time Customization** – Swap videos anytime, no restart needed  
+✔ **Sleek & Modern UI** – Easy controls with a beautiful design  
+✔ **Persistent Settings** – Saves preferences with `LocalStorage`  
+✔ **Lightweight & Fast** – Optimized for smooth performance
+
+---
+
+## 🔧 Tech Stack
+
+⚡ **React JS** – Smooth, reactive frontend  
+🎨 **Tailwind CSS + Daisy UI** – Clean, customizable styling  
+💾 **Zustand + LocalStorage** – Effortless state & storage management
+
+---
+
+## � Get It Now on Steam!
+
+[![Steam Workshop](https://img.shields.io/badge/Steam-Workshop-blue?logo=steam)](https://steamcommunity.com/sharedfiles/filedetails/?id=3463140490)
+
+👉 [Download on Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3463140490)
+
+---
+
+## 🛠️ Installation & Usage
+
+```bash
+# Clone the repository
+git clone https://github.com/OriginalCube/Youtube-Wallpaper.git
+
+# Install dependencies
+pnpm install
+
+# Run the development server
+pnpm run dev
 ```
